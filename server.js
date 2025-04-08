@@ -1,14 +1,14 @@
 const http = require('http');
 const express = require('express');
-const path = require('path');
 const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: ["https://card-deck-simulator.vercel.app", "http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true
   },
   pingTimeout: 60000,
   pingInterval: 25000,
@@ -17,9 +17,6 @@ const io = new Server(server, {
   cleanupEmptyChildNamespaces: true,
   connectTimeout: 45000
 });
-
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'build')));
 
 // Store game state
 let gameState = {
@@ -114,9 +111,9 @@ io.on('connection', (socket) => {
   });
 });
 
-// Handle React routing - serve index.html for all routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// Remove the static file serving and React routing
+app.get('/', (req, res) => {
+  res.send('Card Deck Simulator WebSocket Server');
 });
 
 // Start the server
