@@ -8,11 +8,12 @@ const io = new Server(server, {
   cors: {
     origin: ["https://card-deck-simulator.vercel.app", "http://localhost:3000"],
     methods: ["GET", "POST"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ["my-custom-header"]
   },
   pingTimeout: 60000,
   pingInterval: 25000,
-  transports: ['websocket'],
+  transports: ['polling', 'websocket'],
   allowEIO3: true,
   cleanupEmptyChildNamespaces: true,
   connectTimeout: 45000
@@ -114,6 +115,11 @@ io.on('connection', (socket) => {
 // Remove the static file serving and React routing
 app.get('/', (req, res) => {
   res.send('Card Deck Simulator WebSocket Server');
+});
+
+// Add a health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // Start the server
